@@ -15,7 +15,7 @@ const client = new line.messagingApi.MessagingApiClient({
 const app = express();
 
 app.post("/webhook", middleware(config), (req, res) => {
-  console.log(req.body.events);
+  console.log(req.body);
   console.log(req.body.events?.[0]?.source?.userId);
   client.pushMessage({});
 });
