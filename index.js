@@ -16,7 +16,7 @@ const app = express();
 
 app.post("/webhook", middleware(config), (req, res) => {
   console.log(req.body);
-  console.log(req.body.events?.[0]?.source?.userId);
+  console.log(req.body?.events?.[0]?.source?.userId);
   client.pushMessage({});
 });
 
