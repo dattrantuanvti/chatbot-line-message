@@ -1,54 +1,36 @@
-require("dotenv").config();
 const express = require("express");
-const JSONParseError = require("@line/bot-sdk").JSONParseError;
-const SignatureValidationFailed =
-  require("@line/bot-sdk").SignatureValidationFailed;
-const MessagingApiClient =
-  require("@line/bot-sdk").messagingApi.MessagingApiClient;
+const line = require("@line/bot-sdk");
+require("dotenv").config();
+
+const config = {
+  channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN,
+  channelSecret: process.env.CHANNEL_SECRET,
+};
 
 const app = express();
+app.post("/webhook", line.middleware(config), (req, res) => {
+  Promise.all(req.body.events.map(handleEvent)).then((result) =>
+    res.json(result)
+  );
+});
 
-const client = new MessagingApiClient({
+const client = new line.messagingApi.MessagingApiClient({
   channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN,
 });
-
-app.post("/webhook", (req, res) => {
-  const event = req.body.events[0];
-
-  if (event.type === "message") {
-    const message = event.message;
-    if (message.type === "text" && message.text === "bye") {
-      if (event.source.type === "room") {
-        client.leaveRoom(event.source.roomId);
-      } else if (event.source.type === "group") {
-        client.leaveGroup(event.source.groupId);
-      } else {
-        client.replyMessage({
-          replyToken: event.replyToken,
-          messages: [
-            {
-              type: "text",
-              text: "Nhân viên sẽ hỗ trợ bạn trong ít phút!",
-            },
-          ],
-        });
-      }
-    }
+function handleEvent(event) {
+  if (event.type !== "message" || event.message.type !== "text") {
+    return Promise.resolve(null);
   }
-  return res.json(req.body.events); // req.body will be webhook event object
-});
 
-// Handle errors
-app.use((err, req, res, next) => {
-  if (err instanceof SignatureValidationFailed) {
-    return res.status(401).send(err.signature);
-  } else if (err instanceof JSONParseError) {
-    return res.status(400).send(err.raw);
-  }
-  next(err);
-});
+  return client.replyMessage({
+    replyToken: event.replyToken,
+    messages: [
+      {
+        type: "text",
+        text: event.message.text,
+      },
+    ],
+  });
+}
 
-const PORT = process.env.PORT || 9000;
-app.listen(PORT, () => {
-  console.log("App is listening on PORT " + PORT);
-});
+app.listen(8000);
