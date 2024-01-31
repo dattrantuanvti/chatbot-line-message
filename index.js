@@ -15,15 +15,7 @@ const client = new line.messagingApi.MessagingApiClient({
 const app = express();
 
 app.post("/webhook", middleware(config), (req, res) => {
-  Promise.all(req.body.events.map(handleEvent))
-    .then((result) => {
-      console.log(result);
-      res.json(result);
-    })
-    .catch((err) => {
-      console.error(err);
-      res.status(500).end();
-    });
+  console.log(req.body.events);
 });
 
 // listen on port
