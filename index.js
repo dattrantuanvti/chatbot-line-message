@@ -15,7 +15,12 @@ const client = new line.messagingApi.MessagingApiClient({
 const app = express();
 
 app.post("/webhook", middleware(config), (req, res) => {
-  console.log(req.body.events);
+  const event = req.body.events[0];
+  console.log(event.source.userId);
+  client.pushMessage({
+    to: event.source.userId,
+    messages: [{ type: "text", text: "hello, world" }],
+  });
 });
 
 // listen on port
