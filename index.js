@@ -1,5 +1,6 @@
 const express = require("express");
 require("dotenv").config();
+const line = require("@line/bot-sdk");
 const middleware = require("@line/bot-sdk").middleware;
 
 const config = {
