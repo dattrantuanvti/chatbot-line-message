@@ -1,6 +1,8 @@
 const express = require("express");
 require("dotenv").config();
 const middleware = require("@line/bot-sdk").middleware;
+const MessagingApiClient =
+  require("@line/bot-sdk").messagingApi.MessagingApiClient;
 
 const config = {
   channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN,
@@ -8,6 +10,10 @@ const config = {
 };
 
 const app = express();
+
+const client = new MessagingApiClient({
+  channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN,
+});
 
 app.post("/webhook", middleware(config), (req, res) => {
   const event = req.body.events[0];
