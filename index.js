@@ -16,7 +16,15 @@ const app = express();
 
 app.post("/webhook", middleware(config), (req, res) => {
   console.log(req.body.events);
-  client.pushMessage({});
+  client.pushMessage({
+    to: "U31cec3047ce58b64fd8fc10537c56b69",
+    messages: [
+      {
+        type: "text",
+        text: "Chào mừng bạn đến với channel của chúng tao",
+      },
+    ],
+  });
 });
 
 // listen on port
